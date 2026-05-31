@@ -1,0 +1,237 @@
+{
+  "users": [
+    {
+      "id": "admin_user",
+      "name": "Tomato Admin",
+      "email": "admin@tomato.com",
+      "passwordHash": "admin123",
+      "cart": {}
+    },
+    {
+      "id": "demo_user",
+      "name": "John Doe",
+      "email": "demo@tomato.com",
+      "passwordHash": "demo123",
+      "cart": {
+        "food_1": 2,
+        "food_5": 1
+      }
+    },
+    {
+      "id": "u_z2g4h792u",
+      "name": "sameer",
+      "email": "shaikmsami@gmail.com",
+      "passwordHash": "12345",
+      "cart": {}
+    }
+  ],
+  "foods": [
+    {
+      "_id": "food_1",
+      "name": "Greek Salad",
+      "description": "Crisp cucumber, ripe tomatoes, olives, Feta cheese, tossed in extra virgin olive oil.",
+      "price": 12,
+      "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=60",
+      "category": "Salad"
+    },
+    {
+      "_id": "food_2",
+      "name": "Vegan Garden Salad",
+      "description": "Leafy greens, baby spinach, vibrant carrots, radishes, and lemon vinaigrette.",
+      "price": 10,
+      "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&auto=format&fit=crop&q=60",
+      "category": "Salad"
+    },
+    {
+      "_id": "food_3",
+      "name": "Spring Rolls",
+      "description": "Crisp wrapper bursting with fresh sautéed vegetables, served with sweet chili sauce.",
+      "price": 14,
+      "image": "https://images.unsplash.com/photo-1539252554453-80ab65ce3586?w=500&auto=format&fit=crop&q=60",
+      "category": "Rolls"
+    },
+    {
+      "_id": "food_4",
+      "name": "Paneer Shawarma Wrap",
+      "description": "Soft flatbread wrapped around marinated grilled paneer, onions, peppers, and green chutney.",
+      "price": 15,
+      "image": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&auto=format&fit=crop&q=60",
+      "category": "Rolls"
+    },
+    {
+      "_id": "food_5",
+      "name": "Glazed Chocolate Donut",
+      "description": "Light, fluffy raised donut dipped in a pure chocolate glaze.",
+      "price": 6,
+      "image": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=500&auto=format&fit=crop&q=60",
+      "category": "Deserts"
+    },
+    {
+      "_id": "food_6",
+      "name": "Fruit Cream Parfait",
+      "description": "Creamy layered vanilla mouse topped with candied summer fruits.",
+      "price": 8,
+      "image": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=60",
+      "category": "Deserts"
+    },
+    {
+      "_id": "food_7",
+      "name": "Gourmet Club Sandwich",
+      "description": "Double-decker whole wheat bread layered with lettuce, cheddar cheese, tomato, and garlic mayo.",
+      "price": 14,
+      "image": "https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?w=500&auto=format&fit=crop&q=60",
+      "category": "Sandwich"
+    },
+    {
+      "_id": "food_8",
+      "name": "Pesto Caprese Panini",
+      "description": "Toasted sourdough bread filled with fresh mozzarella, tomato, and fragrant green basil pesto.",
+      "price": 15,
+      "image": "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=500&auto=format&fit=crop&q=60",
+      "category": "Sandwich"
+    },
+    {
+      "_id": "food_9",
+      "name": "Chocolate Fudge Cake",
+      "description": "Rich, velvety multi-layer dark chocolate fudge cake with premium cocoa.",
+      "price": 18,
+      "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500&auto=format&fit=crop&q=60",
+      "category": "Cake"
+    },
+    {
+      "_id": "food_10",
+      "name": "Red Velvet Bliss Slice",
+      "description": "Decadent crimson sponge layered with sweet vanilla bean cream cheese frosting.",
+      "price": 16,
+      "image": "https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?w=500&auto=format&fit=crop&q=60",
+      "category": "Cake"
+    },
+    {
+      "_id": "food_11",
+      "name": "Quinoa Avocado Bowl",
+      "description": "Nutritious steam-cooked quinoa, fresh sliced avocado, roasted chickpeas, and sesame tahini drape.",
+      "price": 18,
+      "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60",
+      "category": "Pure Veg"
+    },
+    {
+      "_id": "food_12",
+      "name": "Mediterranean Hummus Platter",
+      "description": "Trio of herbal hummus, crispy green falafels, stuffed vine leaves, hot grilled pita, and olive dip.",
+      "price": 22,
+      "image": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&auto=format&fit=crop&q=60",
+      "category": "Pure Veg"
+    },
+    {
+      "_id": "food_112",
+      "name": "Creamy Basil Pasta",
+      "description": "Penne pasta folded in a creamy basil spinach sauce, dusted with aged Parmigiano.",
+      "price": 20,
+      "image": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&auto=format&fit=crop&q=60",
+      "category": "Pasta"
+    },
+    {
+      "_id": "food_13",
+      "name": "Spicy Arrabbiata Noodles",
+      "description": "Chili-infused tomato concassé tossed in tender noodles and fresh parsley garnish.",
+      "price": 19,
+      "image": "https://images.unsplash.com/photo-1552611052-33e04de081de?w=500&auto=format&fit=crop&q=60",
+      "category": "Noodles"
+    }
+  ],
+  "orders": [
+    {
+      "_id": "order_1001",
+      "userId": "demo_user",
+      "items": [
+        {
+          "foodId": "food_1",
+          "name": "Greek Salad",
+          "price": 12,
+          "quantity": 2
+        },
+        {
+          "foodId": "food_5",
+          "name": "Glazed Chocolate Donut",
+          "price": 6,
+          "quantity": 1
+        }
+      ],
+      "amount": 35,
+      "address": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "demo@tomato.com",
+        "street": "456 Fresh Ave",
+        "city": "San Francisco",
+        "state": "CA",
+        "zipCode": "94111",
+        "country": "USA",
+        "phone": "415-555-1234"
+      },
+      "status": "Out for Delivery",
+      "date": "2026-05-31T10:27:28.042Z",
+      "payment": true
+    },
+    {
+      "_id": "order_WJUO7VT",
+      "userId": "u_z2g4h792u",
+      "items": [
+        {
+          "foodId": "food_112",
+          "name": "Creamy Basil Pasta",
+          "price": 20,
+          "quantity": 1
+        }
+      ],
+      "amount": 25,
+      "address": {
+        "firstName": "Shaik",
+        "lastName": "Mohammad Sameer",
+        "email": "shaikmohammadsameer@sbi",
+        "street": "9-104 vn puram podili",
+        "city": "Podili",
+        "state": "Andhra Pradesh",
+        "zipCode": "523240",
+        "country": "India",
+        "phone": "09392768535"
+      },
+      "status": "Delivered",
+      "date": "2026-05-31T11:31:22.043Z",
+      "payment": false
+    },
+    {
+      "_id": "order_DG96WFM",
+      "userId": "u_z2g4h792u",
+      "items": [
+        {
+          "foodId": "food_8",
+          "name": "Pesto Caprese Panini",
+          "price": 15,
+          "quantity": 1
+        },
+        {
+          "foodId": "food_1",
+          "name": "Greek Salad",
+          "price": 12,
+          "quantity": 1
+        }
+      ],
+      "amount": 32,
+      "address": {
+        "firstName": "msami",
+        "lastName": "shaik",
+        "email": "shaikmsami@gmail.com",
+        "street": "9-104 vn puram podili",
+        "city": "Podili",
+        "state": "Andhra Pradesh",
+        "zipCode": "523240",
+        "country": "India",
+        "phone": "09392768535"
+      },
+      "status": "Delivered",
+      "date": "2026-05-31T11:33:27.230Z",
+      "payment": false
+    }
+  ]
+}
