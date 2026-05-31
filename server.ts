@@ -272,12 +272,24 @@ const authMiddleware = (req: any, res: any, next: () => void) => {
   }
 
   const verified = verifyToken(token as string);
-  if (!verified) {
+  if (!verified || !verified.userId) {
     return res.status(401).json({ success: false, message: "Session expired or invalid token" });
   }
 
-  req.body.userId = verified.userId;
+  const user = db.users.find(u => u.id === verified.userId);
+  if (!user) {
+    return res.status(401).json({
+      success: false,
+      message: "Session expired. Please log in again."
+    });
+  }
+
+  if (!req.body || typeof req.body !== "object") {
+    req.body = {};
+  }
+  req.body.userId = user.id;
   req.user = verified;
+  req.dbUser = user;
   next();
 };
 
@@ -299,12 +311,24 @@ const adminMiddleware = (req: any, res: any, next: () => void) => {
     });
   }
 
-  if (resolveUserRole(verified.email) !== "admin") {
+  const user = db.users.find(u => u.id === verified.userId);
+  if (!user) {
+    return res.status(401).json({
+      success: false,
+      message: "Session expired. Please log in again."
+    });
+  }
+
+  if (resolveUserRole(user.email) !== "admin") {
     return res.status(403).json({ success: false, message: "Admin access denied" });
   }
 
-  req.body.userId = verified.userId;
+  if (!req.body || typeof req.body !== "object") {
+    req.body = {};
+  }
+  req.body.userId = user.id;
   req.user = verified;
+  req.dbUser = user;
   next();
 };
 
@@ -330,6 +354,15 @@ async function startServer() {
   // REST API DEFINITIONS
   
   // 1. User APIs
+  app.get("/api/user/me", authMiddleware, (req: any, res) => {
+    const user = req.dbUser;
+    const role = resolveUserRole(user.email);
+    return res.json({
+      success: true,
+      user: { _id: user.id, name: user.name, email: user.email, role }
+    });
+  });
+
   app.post("/api/user/register", (req, res) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -436,16 +469,13 @@ async function startServer() {
   });
 
   // 3. Cart APIs (Authorized)
-  app.post("/api/cart/add", authMiddleware, (req, res) => {
-    const { itemId, userId } = req.body;
+  app.post("/api/cart/add", authMiddleware, (req: any, res) => {
+    const { itemId } = req.body;
     if (!itemId) {
       return res.status(400).json({ success: false, message: "Missing 'itemId'" });
     }
 
-    const user = db.users.find(u => u.id === userId);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
+    const user = req.dbUser;
 
     if (!user.cart) {
       user.cart = {};
@@ -457,16 +487,13 @@ async function startServer() {
     return res.json({ success: true, message: "Added To Cart", cartData: user.cart });
   });
 
-  app.post("/api/cart/remove", authMiddleware, (req, res) => {
-    const { itemId, userId } = req.body;
+  app.post("/api/cart/remove", authMiddleware, (req: any, res) => {
+    const { itemId } = req.body;
     if (!itemId) {
       return res.status(400).json({ success: false, message: "Missing 'itemId'" });
     }
 
-    const user = db.users.find(u => u.id === userId);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
+    const user = req.dbUser;
 
     if (user.cart && user.cart[itemId] > 0) {
       user.cart[itemId] -= 1;
@@ -479,28 +506,25 @@ async function startServer() {
     return res.json({ success: true, message: "Removed From Cart", cartData: user.cart || {} });
   });
 
-  app.post("/api/cart/get", authMiddleware, (req, res) => {
-    const { userId } = req.body;
-    const user = db.users.find(u => u.id === userId);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
+  app.post("/api/cart/get", authMiddleware, (req: any, res) => {
+    const user = req.dbUser;
     return res.json({ success: true, cartData: user.cart || {} });
   });
 
   // 4. Order APIs
-  app.post("/api/order/place", authMiddleware, (req, res) => {
+  app.post("/api/order/place", authMiddleware, (req: any, res) => {
     const { userId, items, amount, address } = req.body;
     if (!items || !amount || !address) {
       return res.status(400).json({ success: false, message: "Missing order fields (items, amount, address)" });
     }
 
+    const user = req.dbUser;
+
     // Save order
     const orderId = "order_" + Math.random().toString(36).substring(2, 9).toUpperCase();
     const newOrder: OrderItem = {
       _id: orderId,
-      userId,
+      userId: user.id,
       items,
       amount,
       address,
@@ -512,10 +536,7 @@ async function startServer() {
     db.orders.push(newOrder);
 
     // Empty user's cart in the database now
-    const user = db.users.find(u => u.id === userId);
-    if (user) {
-      user.cart = {};
-    }
+    user.cart = {};
     
     saveDatabase();
 

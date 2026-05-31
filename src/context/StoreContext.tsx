@@ -80,19 +80,51 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
     }, 4500);
   };
 
+  const clearSession = () => {
+    setToken("");
+    setUser(null);
+    setCartItems({});
+    localStorage.removeItem("tomato_token");
+    localStorage.removeItem("tomato_user");
+    setView("store");
+    setCustomerSubView("home");
+  };
+
+  const handleAuthFailure = (response: Response): boolean => {
+    if (response.status === 401) {
+      clearSession();
+      setShowLogin(true);
+      triggerAlert("Session expired. Please sign in again.", "error");
+      return true;
+    }
+    return false;
+  };
+
+  const validateSession = async (savedToken: string) => {
+    try {
+      const response = await fetch("/api/user/me", {
+        headers: { token: savedToken }
+      });
+      const result = await response.json();
+      if (result.success) {
+        setToken(savedToken);
+        setUser(result.user);
+        localStorage.setItem("tomato_user", JSON.stringify(result.user));
+      } else {
+        clearSession();
+      }
+    } catch {
+      clearSession();
+    }
+  };
+
   // Sync state with localStorage on startup
   useEffect(() => {
     const savedToken = localStorage.getItem("tomato_token");
-    const savedUser = localStorage.getItem("tomato_user");
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        localStorage.removeItem("tomato_user");
-      }
-    }
     fetchFoodList();
+    if (savedToken) {
+      validateSession(savedToken);
+    }
   }, []);
 
   // Fetch Cart Details whenever token changes
@@ -129,9 +161,11 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
         headers: {
           "Content-Type": "application/json",
           token: token
-        }
+        },
+        body: JSON.stringify({})
       });
       const result = await response.json();
+      if (handleAuthFailure(response)) return;
       if (result.success) {
         setCartItems(result.cartData || {});
       }
@@ -159,6 +193,15 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ itemId })
         });
         const result = await response.json();
+        if (handleAuthFailure(response)) {
+          setCartItems(prev => {
+            const copy = { ...prev };
+            if (copy[itemId] <= 1) delete copy[itemId];
+            else copy[itemId] -= 1;
+            return copy;
+          });
+          return;
+        }
         if (!result.success) {
           triggerAlert(result.message || "Failed to synchronize cart item", "error");
           // Revert optimistic change
@@ -200,6 +243,13 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ itemId })
         });
         const result = await response.json();
+        if (handleAuthFailure(response)) {
+          setCartItems(prev => ({
+            ...prev,
+            [itemId]: (prev[itemId] || 0) + 1
+          }));
+          return;
+        }
         if (!result.success) {
           // Revert on error
           setCartItems(prev => ({
@@ -343,13 +393,7 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
 
   // Auth: Log out
   const logout = () => {
-    setToken("");
-    setUser(null);
-    setCartItems({});
-    localStorage.removeItem("tomato_token");
-    localStorage.removeItem("tomato_user");
-    setView("store");
-    setCustomerSubView("home");
+    clearSession();
     triggerAlert("Logged out successfully", "info");
   };
 
