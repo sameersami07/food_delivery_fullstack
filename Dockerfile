@@ -1,43 +1,36 @@
-# Stage 1: Build stage
-FROM maven:3.9-eclipse-temurin-21-alpine AS builder
+# Stage 1: Build
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy pom.xml
-COPY pom.xml .
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Copy source code
-COPY src ./src
+COPY . .
+RUN npm run build
 
-# Build the application
-RUN mvn clean package -DskipTests
-
-# Stage 2: Runtime stage
-FROM eclipse-temurin:21-jre-alpine
+# Stage 2: Production
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Install wget for healthcheck
-RUN apk add --no-cache wget
+RUN apk add --no-cache wget && \
+    addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Create non-root user for enhanced security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy the built JAR from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=builder /app/dist ./dist
+COPY db.json ./
 
-# Change ownership to non-root user
 RUN chown -R appuser:appgroup /app
 
-# Switch to non-root user
 USER appuser
 
-# Expose port
-EXPOSE 8080
+ENV NODE_ENV=production
+EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD-SHELL wget --no-verbose --tries=1 --spider "http://localhost:$${PORT:-3000}/api/food/list" || exit 1
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["node", "dist/server.cjs"]
