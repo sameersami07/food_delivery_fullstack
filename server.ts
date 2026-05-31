@@ -199,8 +199,21 @@ function saveDatabase() {
 // Initialize database
 loadDatabase();
 
+const DEV_ADMIN_EMAIL = "admin@tomato.com";
+
 function getAdminEmail(): string {
-  return (process.env.ADMIN_EMAIL || "").toLowerCase().trim();
+  const configured = (process.env.ADMIN_EMAIL || "").toLowerCase().trim();
+  if (configured) return configured;
+
+  if (process.env.NODE_ENV !== "production") {
+    return DEV_ADMIN_EMAIL;
+  }
+
+  return "";
+}
+
+function isAdminConfigured(): boolean {
+  return getAdminEmail().length > 0;
 }
 
 function resolveUserRole(email: string): "admin" | "user" {
@@ -210,6 +223,26 @@ function resolveUserRole(email: string): "admin" | "user" {
   }
   return "user";
 }
+
+function ensureDevAdminUser() {
+  if ((process.env.ADMIN_EMAIL || "").trim()) return;
+  if (process.env.NODE_ENV === "production") return;
+
+  const existing = db.users.find(u => u.email.toLowerCase() === DEV_ADMIN_EMAIL);
+  if (!existing) {
+    db.users.push({
+      id: "dev_admin",
+      name: "Dev Admin",
+      email: DEV_ADMIN_EMAIL,
+      passwordHash: "admin123",
+      cart: {}
+    });
+    saveDatabase();
+    console.warn(`[Tomato] ADMIN_EMAIL not set — dev admin available at ${DEV_ADMIN_EMAIL} / admin123`);
+  }
+}
+
+ensureDevAdminUser();
 
 // Cryptographic Simulation / Encode-Decode JWT values
 function generateToken(userId: string, email: string, role: string = "user"): string {
@@ -257,6 +290,13 @@ const adminMiddleware = (req: any, res: any, next: () => void) => {
   const verified = verifyToken(token as string);
   if (!verified) {
     return res.status(401).json({ success: false, message: "Session expired or invalid token" });
+  }
+
+  if (!isAdminConfigured()) {
+    return res.status(503).json({
+      success: false,
+      message: "Admin not configured. Set the ADMIN_EMAIL environment variable."
+    });
   }
 
   if (resolveUserRole(verified.email) !== "admin") {
@@ -692,6 +732,12 @@ Return ONLY a valid JSON object (no markdown, no code fences) with exactly these
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
+  }
+
+  if (!isAdminConfigured()) {
+    console.error("[Tomato] ADMIN_EMAIL is not set — admin panel is disabled in production.");
+  } else if (!(process.env.ADMIN_EMAIL || "").trim() && process.env.NODE_ENV !== "production") {
+    console.warn(`[Tomato] ADMIN_EMAIL not set — using dev fallback ${DEV_ADMIN_EMAIL}`);
   }
 
   app.listen(PORT, "0.0.0.0", () => {
