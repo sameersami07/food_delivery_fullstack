@@ -45,13 +45,6 @@ export default function LoginPopup() {
     setErrorMsg("");
   };
 
-  const handleAdminlogin = () => {
-    setEmail("admin@tomato.com");
-    setPassword("admin123");
-    setCurrState("Login");
-    setErrorMsg("");
-  };
-
   const handleGoogleCredential = useCallback(async (credential: string) => {
     setErrorMsg("");
     const success = await loginWithGoogle(credential);
@@ -217,17 +210,9 @@ export default function LoginPopup() {
               onClick={handleDemologin}
               type="button"
               disabled={loading}
-              className="flex-1 bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 rounded-xl py-2 px-3 text-[11px] font-semibold text-slate-600 cursor-pointer transition-colors"
+              className="w-full bg-slate-50 hover:bg-slate-100 border border-slate-100 hover:border-slate-200 rounded-xl py-2 px-3 text-[11px] font-semibold text-slate-600 cursor-pointer transition-colors"
             >
               Demo Customer
-            </button>
-            <button
-              onClick={handleAdminlogin}
-              type="button"
-              disabled={loading}
-              className="flex-1 bg-red-50 hover:bg-red-100 border border-red-100 hover:border-red-200 rounded-xl py-2 px-3 text-[11px] font-semibold text-red-600 cursor-pointer transition-colors"
-            >
-              Demo Admin
             </button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StoreContextProvider, useStore } from "./context/StoreContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -17,8 +17,24 @@ function AppContent() {
     customerSubView,
     showLogin,
     alert,
-    loading
+    loading,
+    user,
+    setView,
+    setShowLogin,
+    triggerAlert
   } = useStore();
+
+  useEffect(() => {
+    if (view === "admin" && user?.role !== "admin") {
+      setView("store");
+      if (!user) {
+        setShowLogin(true);
+        triggerAlert("Sign in with your admin account to continue", "error");
+      } else {
+        triggerAlert("Admin access is restricted to the site owner", "error");
+      }
+    }
+  }, [view, user, setView, setShowLogin, triggerAlert]);
 
   // Render responsive notification icon
   const getAlertIcon = (type: string) => {
@@ -50,7 +66,7 @@ function AppContent() {
 
       {/* Main active sub-view viewport */}
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
-        {view === "admin" ? (
+        {view === "admin" && user?.role === "admin" ? (
           <AdminLayout />
         ) : (
           <>

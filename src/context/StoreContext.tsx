@@ -452,8 +452,11 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
 
   // Admin Actions API
   const fetchAllOrders = async (): Promise<OrderItem[]> => {
+    if (!token) return [];
     try {
-      const response = await fetch("/api/order/list");
+      const response = await fetch("/api/order/list", {
+        headers: { token }
+      });
       const result = await response.json();
       if (result.success) {
         return result.data || [];
@@ -466,10 +469,11 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
   };
 
   const updateOrderStatus = async (orderId: string, status: string): Promise<boolean> => {
+    if (!token) return false;
     try {
       const response = await fetch("/api/order/status", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", token },
         body: JSON.stringify({ orderId, status })
       });
       const result = await response.json();
@@ -487,10 +491,11 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteFoodItem = async (id: string): Promise<boolean> => {
+    if (!token) return false;
     try {
       const response = await fetch("/api/food/remove", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", token },
         body: JSON.stringify({ id })
       });
       const result = await response.json();
@@ -509,10 +514,11 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
   };
 
   const addNewFoodItem = async (food: Omit<FoodItem, "_id"> & { image?: string }): Promise<boolean> => {
+    if (!token) return false;
     try {
       const response = await fetch("/api/food/add", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", token },
         body: JSON.stringify(food)
       });
       const result = await response.json();
@@ -531,10 +537,14 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
   };
 
   const generateFoodDetails = async (name: string, categoryHint?: string) => {
+    if (!token) {
+      triggerAlert("Admin login required for AI generation", "error");
+      return null;
+    }
     try {
       const response = await fetch("/api/ai/generate-food-details", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", token },
         body: JSON.stringify({ name, categoryHint })
       });
       const result = await response.json();

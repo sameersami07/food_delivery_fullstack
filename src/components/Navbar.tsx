@@ -54,21 +54,18 @@ export default function Navbar() {
             >
               Track Deliveries
             </button>
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-            <button 
-              onClick={() => { 
-                if (user?.role === "admin") {
-                  setView("admin");
-                } else {
-                  setView("admin");
-                  // Let them see the admin portal directly or prompt login
-                }
-              }}
-              className={`hover:text-red-500 transition-colors cursor-pointer text-sm py-1 border-b-2 flex items-center gap-1.5 ${view === 'admin' ? 'text-red-500 border-red-500 font-semibold' : 'border-transparent'}`}
-            >
-              <LayoutDashboard size={15} />
-              Admin Dashboard
-            </button>
+            {user?.role === "admin" && (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                <button 
+                  onClick={() => setView("admin")}
+                  className={`hover:text-red-500 transition-colors cursor-pointer text-sm py-1 border-b-2 flex items-center gap-1.5 ${view === 'admin' ? 'text-red-500 border-red-500 font-semibold' : 'border-transparent'}`}
+                >
+                  <LayoutDashboard size={15} />
+                  Admin Dashboard
+                </button>
+              </>
+            )}
           </div>
 
           {/* Action buttons list */}

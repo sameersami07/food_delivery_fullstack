@@ -135,13 +135,6 @@ interface DbSchema {
 let db: DbSchema = {
   users: [
     {
-      id: "admin_user",
-      name: "Tomato Admin",
-      email: "admin@tomato.com",
-      passwordHash: "admin123", // Simple hash
-      cart: {}
-    },
-    {
       id: "demo_user",
       name: "John Doe",
       email: "demo@tomato.com",
@@ -206,6 +199,18 @@ function saveDatabase() {
 // Initialize database
 loadDatabase();
 
+function getAdminEmail(): string {
+  return (process.env.ADMIN_EMAIL || "").toLowerCase().trim();
+}
+
+function resolveUserRole(email: string): "admin" | "user" {
+  const adminEmail = getAdminEmail();
+  if (adminEmail && email.toLowerCase() === adminEmail) {
+    return "admin";
+  }
+  return "user";
+}
+
 // Cryptographic Simulation / Encode-Decode JWT values
 function generateToken(userId: string, email: string, role: string = "user"): string {
   const payload = { userId, email, role, exp: Date.now() + 86400000 };
@@ -236,6 +241,26 @@ const authMiddleware = (req: any, res: any, next: () => void) => {
   const verified = verifyToken(token as string);
   if (!verified) {
     return res.status(401).json({ success: false, message: "Session expired or invalid token" });
+  }
+
+  req.body.userId = verified.userId;
+  req.user = verified;
+  next();
+};
+
+const adminMiddleware = (req: any, res: any, next: () => void) => {
+  const token = req.headers.token || req.headers.authorization?.replace("Bearer ", "");
+  if (!token) {
+    return res.status(401).json({ success: false, message: "Not Authorized, Login Again" });
+  }
+
+  const verified = verifyToken(token as string);
+  if (!verified) {
+    return res.status(401).json({ success: false, message: "Session expired or invalid token" });
+  }
+
+  if (resolveUserRole(verified.email) !== "admin") {
+    return res.status(403).json({ success: false, message: "Admin access denied" });
   }
 
   req.body.userId = verified.userId;
@@ -278,7 +303,7 @@ async function startServer() {
     }
 
     // Set role
-    const role = email.toLowerCase() === "admin@tomato.com" ? "admin" : "user";
+    const role = resolveUserRole(email.toLowerCase());
     const newUser = {
       id: "u_" + Math.random().toString(36).substring(2, 11),
       name,
@@ -315,7 +340,7 @@ async function startServer() {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
-    const role = user.email.toLowerCase() === "admin@tomato.com" ? "admin" : "user";
+    const role = resolveUserRole(user.email);
     const token = generateToken(user.id, user.email, role);
     return res.json({
       success: true,
@@ -330,7 +355,7 @@ async function startServer() {
     return res.json({ success: true, data: db.foods });
   });
 
-  app.post("/api/food/add", (req, res) => {
+  app.post("/api/food/add", adminMiddleware, (req, res) => {
     const { name, description, price, category, image } = req.body;
     if (!name || !description || price === undefined || !category) {
       return res.status(400).json({ success: false, message: "Missing food fields (name, description, price, category)" });
@@ -353,7 +378,7 @@ async function startServer() {
     return res.json({ success: true, message: "Food Added Successfully", data: newFood });
   });
 
-  app.post("/api/food/remove", (req, res) => {
+  app.post("/api/food/remove", adminMiddleware, (req, res) => {
     const { id } = req.body;
     if (!id) {
       return res.status(400).json({ success: false, message: "Missing property 'id' to remove" });
@@ -490,13 +515,13 @@ async function startServer() {
   });
 
   // List all orders (Admin only API)
-  app.get("/api/order/list", (req, res) => {
+  app.get("/api/order/list", adminMiddleware, (req, res) => {
     // Return all orders
     return res.json({ success: true, data: db.orders });
   });
 
   // Alter food order delivery progress status
-  app.post("/api/order/status", (req, res) => {
+  app.post("/api/order/status", adminMiddleware, (req, res) => {
     const { orderId, status } = req.body;
     if (!orderId || !status) {
       return res.status(400).json({ success: false, message: "Missing 'orderId' or 'status'" });
@@ -523,7 +548,7 @@ async function startServer() {
   });
 
   // Gemini AI: auto-generate food menu details for admin
-  app.post("/api/ai/generate-food-details", async (req, res) => {
+  app.post("/api/ai/generate-food-details", adminMiddleware, async (req, res) => {
     const { name, categoryHint } = req.body;
     if (!name || typeof name !== "string" || !name.trim()) {
       return res.status(400).json({ success: false, message: "Please provide a food name or idea" });
@@ -621,7 +646,7 @@ Return ONLY a valid JSON object (no markdown, no code fences) with exactly these
 
       const email = payload.email.toLowerCase();
       const displayName = payload.name || email.split("@")[0];
-      const role = email === "admin@tomato.com" ? "admin" : "user";
+      const role = resolveUserRole(email);
 
       let user = db.users.find(u => u.email.toLowerCase() === email);
       if (!user) {
