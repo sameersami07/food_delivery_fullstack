@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useStore } from "../context/StoreContext";
+import GoogleSignInButton from "./GoogleSignInButton";
 import { Mail, Lock, User as UserIcon, X, Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function LoginPopup() {
-  const { setShowLogin, loginUser, registerUser, loading } = useStore();
+  const { setShowLogin, loginUser, loginWithGoogle, registerUser, loading } = useStore();
   const [currState, setCurrState] = useState<"Login" | "Sign Up">("Login");
   
   // Fields state
@@ -50,6 +51,14 @@ export default function LoginPopup() {
     setCurrState("Login");
     setErrorMsg("");
   };
+
+  const handleGoogleCredential = useCallback(async (credential: string) => {
+    setErrorMsg("");
+    const success = await loginWithGoogle(credential);
+    if (!success) {
+      setErrorMsg("Google sign-in failed. Check GOOGLE_CLIENT_ID configuration.");
+    }
+  }, [loginWithGoogle]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -187,6 +196,16 @@ export default function LoginPopup() {
             )}
           </button>
         </form>
+
+        {/* Google Sign-In */}
+        <div className="mt-4">
+          <div className="relative flex items-center py-2">
+            <div className="flex-grow border-t border-slate-100"></div>
+            <span className="flex-shrink mx-3 text-[10px] uppercase font-bold tracking-widest text-slate-400">or</span>
+            <div className="flex-grow border-t border-slate-100"></div>
+          </div>
+          <GoogleSignInButton onCredential={handleGoogleCredential} disabled={loading} />
+        </div>
 
         {/* Demo Fast Login presets for easier evaluation! */}
         <div className="mt-5 border-t border-slate-100 pt-4 flex flex-col items-center">

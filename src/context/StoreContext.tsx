@@ -27,6 +27,7 @@ interface StoreContextType {
   getCartTotal: () => number;
   getCartCount: () => number;
   loginUser: (email: string, passwordHash: string) => Promise<boolean>;
+  loginWithGoogle: (credential: string) => Promise<boolean>;
   registerUser: (name: string, email: string, passwordHash: string) => Promise<boolean>;
   logout: () => void;
   placeNewOrder: (address: DeliveryAddress) => Promise<string | null>;
@@ -36,6 +37,12 @@ interface StoreContextType {
   updateOrderStatus: (orderId: string, status: string) => Promise<boolean>;
   deleteFoodItem: (id: string) => Promise<boolean>;
   addNewFoodItem: (food: Omit<FoodItem, "_id"> & { image?: string }) => Promise<boolean>;
+  generateFoodDetails: (name: string, categoryHint?: string) => Promise<{
+    name: string;
+    description: string;
+    category: string;
+    suggestedPrice: number;
+  } | null>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -264,6 +271,44 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const applyAuthSession = (result: { token: string; user: User; message?: string }) => {
+    setToken(result.token);
+    setUser(result.user);
+    localStorage.setItem("tomato_token", result.token);
+    localStorage.setItem("tomato_user", JSON.stringify(result.user));
+    triggerAlert(result.message || `Welcome, ${result.user.name}!`, "success");
+    setShowLogin(false);
+    if (result.user.role === "admin") {
+      setView("admin");
+      setAdminSubView("orders");
+    }
+  };
+
+  // Auth: Google Sign-In
+  const loginWithGoogle = async (credential: string): Promise<boolean> => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/user/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential })
+      });
+      const result = await response.json();
+      setLoading(false);
+
+      if (result.success) {
+        applyAuthSession(result);
+        return true;
+      }
+      triggerAlert(result.message || "Google sign-in failed", "error");
+      return false;
+    } catch (err) {
+      setLoading(false);
+      triggerAlert("Failed to reach Google sign-in endpoint", "error");
+      return false;
+    }
+  };
+
   // Auth: Sign registration
   const registerUser = async (name: string, email: string, passwordHash: string): Promise<boolean> => {
     setLoading(true);
@@ -485,6 +530,25 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const generateFoodDetails = async (name: string, categoryHint?: string) => {
+    try {
+      const response = await fetch("/api/ai/generate-food-details", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, categoryHint })
+      });
+      const result = await response.json();
+      if (result.success) {
+        return result.data;
+      }
+      triggerAlert(result.message || "AI generation failed", "error");
+      return null;
+    } catch (err) {
+      triggerAlert("Could not reach AI service", "error");
+      return null;
+    }
+  };
+
   return (
     <StoreContext.Provider
       value={{
@@ -511,6 +575,7 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
         getCartTotal,
         getCartCount,
         loginUser,
+        loginWithGoogle,
         registerUser,
         logout,
         placeNewOrder,
@@ -519,7 +584,8 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
         fetchAllOrders,
         updateOrderStatus,
         deleteFoodItem,
-        addNewFoodItem
+        addNewFoodItem,
+        generateFoodDetails
       }}
     >
       {children}

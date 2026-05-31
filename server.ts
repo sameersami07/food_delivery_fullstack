@@ -1,7 +1,9 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
+import { GoogleGenAI } from "@google/genai";
 import { FoodItem, OrderItem, User, OrderStatus } from "./src/types";
 
 // Setup database paths
@@ -509,6 +511,145 @@ async function startServer() {
     saveDatabase();
 
     return res.json({ success: true, message: "Status Updated Successfully", data: db.orders[index] });
+  });
+
+  // Public config for client-side Google APIs (keys are referrer-restricted in Google Cloud)
+  app.get("/api/config/public", (_req, res) => {
+    return res.json({
+      success: true,
+      googleClientId: process.env.GOOGLE_CLIENT_ID || "",
+      googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || ""
+    });
+  });
+
+  // Gemini AI: auto-generate food menu details for admin
+  app.post("/api/ai/generate-food-details", async (req, res) => {
+    const { name, categoryHint } = req.body;
+    if (!name || typeof name !== "string" || !name.trim()) {
+      return res.status(400).json({ success: false, message: "Please provide a food name or idea" });
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(503).json({
+        success: false,
+        message: "Gemini API key not configured. Add GEMINI_API_KEY to your environment."
+      });
+    }
+
+    const categories = ["Salad", "Rolls", "Deserts", "Sandwich", "Cake", "Pure Veg", "Pasta", "Noodles"];
+    const hint = categoryHint ? ` Prefer category: ${categoryHint}.` : "";
+
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: `You write menu copy for a food delivery app called Tomato.
+Given this food item idea: "${name.trim()}"${hint}
+
+Return ONLY a valid JSON object (no markdown, no code fences) with exactly these fields:
+{
+  "name": "polished product name",
+  "description": "2-3 appetizing sentences mentioning key ingredients",
+  "category": "one of: ${categories.join(", ")}",
+  "suggestedPrice": number between 5 and 25 (USD, no currency symbol)
+}`
+      });
+
+      const raw = (response.text || "").trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+      const parsed = JSON.parse(raw);
+
+      if (!parsed.description || !parsed.category) {
+        return res.status(502).json({ success: false, message: "AI returned incomplete data. Try again." });
+      }
+
+      if (!categories.includes(parsed.category)) {
+        parsed.category = categoryHint || "Salad";
+      }
+
+      return res.json({
+        success: true,
+        data: {
+          name: parsed.name || name.trim(),
+          description: parsed.description,
+          category: parsed.category,
+          suggestedPrice: Number(parsed.suggestedPrice) || 12
+        }
+      });
+    } catch (err) {
+      console.error("Gemini generate-food-details error:", err);
+      return res.status(500).json({ success: false, message: "Failed to generate food details. Check your Gemini API key." });
+    }
+  });
+
+  // Google Sign-In: verify ID token and login or register
+  app.post("/api/user/google", async (req, res) => {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ success: false, message: "Missing Google credential" });
+    }
+
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      return res.status(503).json({
+        success: false,
+        message: "Google Sign-In not configured. Add GOOGLE_CLIENT_ID to your environment."
+      });
+    }
+
+    try {
+      const tokenRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+      if (!tokenRes.ok) {
+        return res.status(401).json({ success: false, message: "Invalid Google token" });
+      }
+
+      const payload = await tokenRes.json() as {
+        aud: string;
+        email?: string;
+        email_verified?: string;
+        name?: string;
+        sub?: string;
+      };
+
+      if (payload.aud !== clientId) {
+        return res.status(401).json({ success: false, message: "Google token audience mismatch" });
+      }
+
+      if (!payload.email || payload.email_verified !== "true") {
+        return res.status(401).json({ success: false, message: "Google account email not verified" });
+      }
+
+      const email = payload.email.toLowerCase();
+      const displayName = payload.name || email.split("@")[0];
+      const role = email === "admin@tomato.com" ? "admin" : "user";
+
+      let user = db.users.find(u => u.email.toLowerCase() === email);
+      if (!user) {
+        user = {
+          id: "u_" + Math.random().toString(36).substring(2, 11),
+          name: displayName,
+          email,
+          passwordHash: `google:${payload.sub}`,
+          cart: {}
+        };
+        db.users.push(user);
+        saveDatabase();
+      } else if (user.name !== displayName && displayName) {
+        user.name = displayName;
+        saveDatabase();
+      }
+
+      const token = generateToken(user.id, user.email, role);
+      return res.json({
+        success: true,
+        message: "Signed in with Google",
+        token,
+        user: { _id: user.id, name: user.name, email: user.email, role }
+      });
+    } catch (err) {
+      console.error("Google sign-in error:", err);
+      return res.status(500).json({ success: false, message: "Google sign-in failed" });
+    }
   });
 
   // Serve static assets and Vite server

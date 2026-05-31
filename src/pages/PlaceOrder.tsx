@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "../context/StoreContext";
+import AddressAutocomplete, { ParsedAddress } from "../components/AddressAutocomplete";
 import { MapPin, ShieldCheck, CreditCard, ArrowLeft, Loader2 } from "lucide-react";
 
 export default function PlaceOrder() {
@@ -37,6 +38,17 @@ export default function PlaceOrder() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setAddress(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddressSelect = (parsed: ParsedAddress) => {
+    setAddress(prev => ({
+      ...prev,
+      street: parsed.street || prev.street,
+      city: parsed.city || prev.city,
+      state: parsed.state || prev.state,
+      zipCode: parsed.zipCode || prev.zipCode,
+      country: parsed.country || prev.country
+    }));
   };
 
   const handlePlaceOrderSubmit = async (e: React.FormEvent) => {
@@ -147,13 +159,11 @@ export default function PlaceOrder() {
 
           <div>
             <label className="block text-[11px] font-semibold text-slate-500 mb-1.5 uppercase ml-1">Street Address</label>
-            <input
-              type="text"
-              name="street"
+            <AddressAutocomplete
               value={address.street}
-              onChange={handleChange}
-              required
-              placeholder="Street Name, Apt / Block number"
+              onChange={(street) => setAddress(prev => ({ ...prev, street }))}
+              onAddressSelect={handleAddressSelect}
+              placeholder="Start typing your address..."
               className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-3 px-4 text-xs font-medium text-slate-700 outline-none focus:bg-white focus:ring-1 focus:ring-red-500/20 focus:border-red-500 transition-all placeholder:text-slate-400"
             />
           </div>
