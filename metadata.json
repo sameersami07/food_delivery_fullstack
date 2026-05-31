@@ -1,0 +1,6 @@
+{
+  "name": "Tomato",
+  "description": "Full-stack food delivery web application containing a customer storefront and administrative dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
