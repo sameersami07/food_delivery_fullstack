@@ -27,16 +27,16 @@ export default function Cart() {
 
     if (!promoCode.trim()) return;
 
-    if (promoCode.trim().toUpperCase() === "TOMATO5") {
+    if (promoCode.trim().toUpperCase() === "FOODIE5") {
       if (getCartTotal() < 15) {
-        setPromoError("Promo code 'TOMATO5' requires a minimum order subtotal of $15.00");
+        setPromoError("Promo code 'FOODIE5' requires a minimum order subtotal of $15.00");
         return;
       }
       setDiscount(5);
-      setPromoApplied("TOMATO5");
-      triggerAlert("Promo Coupon 'TOMATO5' applied! You saved $5.00", "success");
+      setPromoApplied("FOODIE5");
+      triggerAlert("Promo Coupon 'FOODIE5' applied! You saved $5.00", "success");
     } else {
-      setPromoError("Invalid promo code. Hint: Use coupon 'TOMATO5'");
+      setPromoError("Invalid promo code. Hint: Use coupon 'FOODIE5'");
     }
   };
 
@@ -53,8 +53,8 @@ export default function Cart() {
     }
 
     // Direct to delivery addressing details
-    localStorage.setItem("tomato_active_discount", String(discount));
-    localStorage.setItem("tomato_promo_applied", promoApplied);
+    localStorage.setItem("foodie_active_discount", String(discount));
+    localStorage.setItem("foodie_promo_applied", promoApplied);
     setCustomerSubView("order");
   };
 
@@ -189,7 +189,7 @@ export default function Cart() {
               <form onSubmit={handleApplyPromo} className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Promo Code (e.g. TOMATO5)"
+                  placeholder="Promo Code (e.g. FOODIE5)"
                   value={promoCode}
                   onChange={(e) => setPromoCode(e.target.value)}
                   disabled={!!promoApplied}
@@ -227,7 +227,7 @@ export default function Cart() {
 
               {!promoApplied && (
                 <p className="text-[10px] text-slate-400 select-all border border-slate-100 py-1.5 px-2.5 rounded bg-slate-50/50 block text-center leading-normal">
-                  💡 Hint: Apply <strong className="text-red-500">TOMATO5</strong> to receive discount on products over $15!
+                  💡 Hint: Apply <strong className="text-red-500">FOODIE5</strong> to receive discount on products over $15!
                 </p>
               )}
             </div>

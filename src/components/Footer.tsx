@@ -11,10 +11,10 @@ export default function Footer() {
           <div className="space-y-4 md:col-span-2">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white font-bold leading-none text-base">
-                T
+                F
               </div>
               <span className="text-xl font-bold text-white tracking-tight">
-                TOMATO<span className="text-red-500">.</span>
+                FOODIE<span className="text-red-500">.</span>
               </span>
             </div>
             
@@ -41,7 +41,7 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-xs text-slate-400 font-medium">
               <li>
-                <span className="hover:text-white transition-colors cursor-pointer">About Tomato</span>
+                <span className="hover:text-white transition-colors cursor-pointer">About Foodie</span>
               </li>
               <li>
                 <span className="hover:text-white transition-colors cursor-pointer">Delivery Careers</span>
@@ -63,11 +63,11 @@ export default function Footer() {
             <ul className="space-y-2 text-xs text-slate-400 font-medium">
               <li className="flex items-center space-x-2">
                 <PhoneCall size={12} className="text-red-500" />
-                <span>+1 (800) 555-TOMATO</span>
+                <span>+1 (800) 555-FOODIE</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Mail size={12} className="text-red-500" />
-                <span>support@tomato.com</span>
+                <span>support@foodie.com</span>
               </li>
               <li className="flex items-center space-x-2">
                 <MapPin size={12} className="text-red-500" />
@@ -82,7 +82,7 @@ export default function Footer() {
         <hr className="border-slate-900 my-6" />
 
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px] text-slate-500 font-medium">
-          <p>© 2026 TOMATO Food Services Inc. All absolute rights reserved.</p>
+          <p>© 2026 FOODIE Food Services Inc. All absolute rights reserved.</p>
           <div className="flex items-center space-x-4">
             <span className="hover:text-slate-400 cursor-pointer">Privacy Policies</span>
             <span>•</span>

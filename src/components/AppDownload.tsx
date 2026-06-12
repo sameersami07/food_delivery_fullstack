@@ -19,7 +19,7 @@ export default function AppDownload() {
         <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
           For Better Experience Download <br className="hidden sm:inline" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-rose-400 font-black">
-            Tomato Mobile App
+            Foodie Mobile App
           </span>
         </h2>
         

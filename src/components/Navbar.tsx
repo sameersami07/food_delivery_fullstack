@@ -32,10 +32,10 @@ export default function Navbar() {
             id="nav-logo"
           >
             <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white font-bold shadow-lg shadow-red-500/20 text-xl tracking-tight">
-              T
+              F
             </div>
             <span className="text-2xl font-bold tracking-tight text-slate-800">
-              TOMATO<span className="text-red-500 font-extrabold">.</span>
+              FOODIE<span className="text-red-500 font-extrabold">.</span>
             </span>
           </div>
 

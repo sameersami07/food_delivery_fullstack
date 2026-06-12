@@ -50,7 +50,7 @@ export default function AdminLayout() {
           <span className="bg-red-500 text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full select-none leading-none">
             Admin console
           </span>
-          <h2 className="text-xl font-bold tracking-tight mt-1">Tomato Central Management</h2>
+          <h2 className="text-xl font-bold tracking-tight mt-1">Foodie Central Management</h2>
           <p className="text-xs text-slate-400 mt-0.5">Control live food catalog menus, record items checkout dispatches, and alter ship progress.</p>
         </div>
         <div className="relative z-10 text-xs text-slate-400 font-medium bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 self-start sm:self-auto">
@@ -465,7 +465,7 @@ function OrdersSubView({ orders, loading, handleRefresh, handleStatusUpdate }: O
                 {/* Meta head info */}
                 <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2 border-b border-slate-50 pb-3 text-xs">
                   <div>
-                    <span className="font-bold text-red-500">Tomato Ticket Order</span>
+                    <span className="font-bold text-red-500">Foodie Ticket Order</span>
                     <span className="text-slate-300 mx-2">|</span>
                     <span className="font-mono font-semibold text-slate-400">#{order._id}</span>
                   </div>

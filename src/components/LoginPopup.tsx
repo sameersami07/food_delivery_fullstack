@@ -31,7 +31,7 @@ export default function LoginPopup() {
     if (currState === "Login") {
       const success = await loginUser(email, password);
       if (!success) {
-        setErrorMsg("Invalid credentials. Try demo@tomato.com with demo123");
+        setErrorMsg("Invalid credentials. Try demo@foodie.com with demo123");
       }
     } else {
       await registerUser(name, email, password);
@@ -39,7 +39,7 @@ export default function LoginPopup() {
   };
 
   const handleDemologin = () => {
-    setEmail("demo@tomato.com");
+    setEmail("demo@foodie.com");
     setPassword("demo123");
     setCurrState("Login");
     setErrorMsg("");
@@ -80,7 +80,7 @@ export default function LoginPopup() {
           </h2>
           <p className="text-xs text-slate-400 mt-1">
             {currState === "Login" 
-              ? "Access your tomato order profiles & histories" 
+              ? "Access your foodie order profiles & histories" 
               : "Register an account to start placing hot orders"
             }
           </p>
@@ -168,7 +168,7 @@ export default function LoginPopup() {
                 className="mt-0.5 rounded accent-red-500 h-3.5 w-3.5 border-slate-200 cursor-pointer"
               />
               <label htmlFor="terms" className="text-[11px] text-slate-400 font-normal leading-normal cursor-pointer select-none">
-                By registering an account with us, I accept the terms of service agreement & privacy policies of Tomato.
+                By registering an account with us, I accept the terms of service agreement & privacy policies of Foodie.
               </label>
             </div>
           )}
@@ -221,7 +221,7 @@ export default function LoginPopup() {
         <div className="mt-5 text-center text-xs text-slate-400 pt-3 border-t border-slate-50">
           {currState === "Login" ? (
             <p>
-              New to Tomato?{" "}
+              New to Foodie?{" "}}
               <button
                 onClick={() => setCurrState("Sign Up")}
                 className="font-bold text-red-500 hover:underline cursor-pointer"

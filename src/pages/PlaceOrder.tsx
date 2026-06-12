@@ -29,7 +29,7 @@ export default function PlaceOrder() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const savedDiscount = localStorage.getItem("tomato_active_discount");
+    const savedDiscount = localStorage.getItem("foodie_active_discount");
     if (savedDiscount) {
       setDiscount(Number(savedDiscount));
     }
