@@ -221,7 +221,7 @@ export default function LoginPopup() {
         <div className="mt-5 text-center text-xs text-slate-400 pt-3 border-t border-slate-50">
           {currState === "Login" ? (
             <p>
-              New to Foodie?{" "}}
+              New to Foodie?{" "}
               <button
                 onClick={() => setCurrState("Sign Up")}
                 className="font-bold text-red-500 hover:underline cursor-pointer"
