@@ -1,4 +1,4 @@
-# 🍅 Tomato Food Delivery
+# 🍅 Foodie Food Delivery
 
 > **A full-stack food delivery app built with React + Express, enhanced by 3 free Google APIs for AI, maps, and authentication.**
 
@@ -13,7 +13,7 @@
 
 ## 🌟 Why This Project Stands Out — Google APIs Integration
 
-Most food delivery demos stop at a basic cart and login. **Tomato uses Google's free developer tools** to deliver a real product feel:
+Most food delivery demos stop at a basic cart and login. **Foodie uses Google's free developer tools** to deliver a real product feel:
 
 ### 1. 🤖 Google Gemini AI — Smart Menu Generator
 **API:** [Gemini Developer API](https://ai.google.dev/) · **Free tier:** [Google AI Studio](https://aistudio.google.com/apikey)
@@ -148,8 +148,8 @@ npm run dev
 ## 🐳 Docker
 
 ```bash
-docker build -t tomato .
-docker run -p 3000:3000 --env-file .env tomato
+docker build -t foodie .
+docker run -p 3000:3000 --env-file .env foodie
 ```
 
 ---

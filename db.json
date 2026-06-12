@@ -2,15 +2,15 @@
   "users": [
     {
       "id": "admin_user",
-      "name": "Tomato Admin",
-      "email": "admin@tomato.com",
+      "name": "Foodie Admin",
+      "email": "admin@foodie.com",
       "passwordHash": "admin123",
       "cart": {}
     },
     {
       "id": "demo_user",
       "name": "John Doe",
-      "email": "demo@tomato.com",
+      "email": "demo@foodie.com",
       "passwordHash": "demo123",
       "cart": {
         "food_1": 2,

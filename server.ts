@@ -137,7 +137,7 @@ let db: DbSchema = {
     {
       id: "demo_user",
       name: "John Doe",
-      email: "demo@tomato.com",
+      email: "demo@foodie.com",
       passwordHash: "demo123",
       cart: { "food_1": 2, "food_5": 1 }
     }
@@ -155,7 +155,7 @@ let db: DbSchema = {
       address: {
         firstName: "John",
         lastName: "Doe",
-        email: "demo@tomato.com",
+        email: "demo@foodie.com",
         street: "456 Fresh Ave",
         city: "San Francisco",
         state: "CA",
@@ -199,7 +199,7 @@ function saveDatabase() {
 // Initialize database
 loadDatabase();
 
-const DEV_ADMIN_EMAIL = "admin@tomato.com";
+const DEV_ADMIN_EMAIL = "admin@foodie.com";
 
 function getAdminEmail(): string {
   const configured = (process.env.ADMIN_EMAIL || "").toLowerCase().trim();
@@ -238,7 +238,7 @@ function ensureDevAdminUser() {
       cart: {}
     });
     saveDatabase();
-    console.warn(`[Tomato] ADMIN_EMAIL not set — dev admin available at ${DEV_ADMIN_EMAIL} / admin123`);
+    console.warn(`[Foodie] ADMIN_EMAIL not set — dev admin available at ${DEV_ADMIN_EMAIL} / admin123`);
   }
 }
 
@@ -758,7 +758,7 @@ Return ONLY a valid JSON object (no markdown, no code fences) with exactly these
   if (!isAdminConfigured()) {
     console.error("[Tomato] ADMIN_EMAIL is not set — admin panel is disabled in production.");
   } else if (!(process.env.ADMIN_EMAIL || "").trim() && process.env.NODE_ENV !== "production") {
-    console.warn(`[Tomato] ADMIN_EMAIL not set — using dev fallback ${DEV_ADMIN_EMAIL}`);
+    console.warn(`[Foodie] ADMIN_EMAIL not set — using dev fallback ${DEV_ADMIN_EMAIL}`);
   }
 
   app.listen(PORT, "0.0.0.0", () => {
