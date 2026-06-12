@@ -630,7 +630,7 @@ async function startServer() {
       const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
-        contents: `You write menu copy for a food delivery app called Tomato.
+        contents: `You write menu copy for a food delivery app called Foodie.
 Given this food item idea: "${name.trim()}"${hint}
 
 Return ONLY a valid JSON object (no markdown, no code fences) with exactly these fields:
@@ -756,7 +756,7 @@ Return ONLY a valid JSON object (no markdown, no code fences) with exactly these
   }
 
   if (!isAdminConfigured()) {
-    console.error("[Tomato] ADMIN_EMAIL is not set — admin panel is disabled in production.");
+    console.error("[Foodie] ADMIN_EMAIL is not set — admin panel is disabled in production.");
   } else if (!(process.env.ADMIN_EMAIL || "").trim() && process.env.NODE_ENV !== "production") {
     console.warn(`[Foodie] ADMIN_EMAIL not set — using dev fallback ${DEV_ADMIN_EMAIL}`);
   }

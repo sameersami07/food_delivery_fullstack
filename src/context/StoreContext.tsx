@@ -84,8 +84,8 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
     setToken("");
     setUser(null);
     setCartItems({});
-    localStorage.removeItem("tomato_token");
-    localStorage.removeItem("tomato_user");
+    localStorage.removeItem("foodie_token");
+    localStorage.removeItem("foodie_user");
     setView("store");
     setCustomerSubView("home");
   };
@@ -109,7 +109,7 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
       if (result.success) {
         setToken(savedToken);
         setUser(result.user);
-        localStorage.setItem("tomato_user", JSON.stringify(result.user));
+        localStorage.setItem("foodie_user", JSON.stringify(result.user));
       } else {
         clearSession();
       }
@@ -120,7 +120,7 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
 
   // Sync state with localStorage on startup
   useEffect(() => {
-    const savedToken = localStorage.getItem("tomato_token");
+    const savedToken = localStorage.getItem("foodie_token");
     fetchFoodList();
     if (savedToken) {
       validateSession(savedToken);
@@ -298,8 +298,8 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
       if (result.success) {
         setToken(result.token);
         setUser(result.user);
-        localStorage.setItem("tomato_token", result.token);
-        localStorage.setItem("tomato_user", JSON.stringify(result.user));
+        localStorage.setItem("foodie_token", result.token);
+        localStorage.setItem("foodie_user", JSON.stringify(result.user));
         
         triggerAlert(`Welcome back, ${result.user.name}!`, "success");
         setShowLogin(false);
@@ -324,8 +324,8 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
   const applyAuthSession = (result: { token: string; user: User; message?: string }) => {
     setToken(result.token);
     setUser(result.user);
-    localStorage.setItem("tomato_token", result.token);
-    localStorage.setItem("tomato_user", JSON.stringify(result.user));
+    localStorage.setItem("foodie_token", result.token);
+    localStorage.setItem("foodie_user", JSON.stringify(result.user));
     triggerAlert(result.message || `Welcome, ${result.user.name}!`, "success");
     setShowLogin(false);
     if (result.user.role === "admin") {
@@ -374,8 +374,8 @@ export function StoreContextProvider({ children }: { children: ReactNode }) {
       if (result.success) {
         setToken(result.token);
         setUser(result.user);
-        localStorage.setItem("tomato_token", result.token);
-        localStorage.setItem("tomato_user", JSON.stringify(result.user));
+        localStorage.setItem("foodie_token", result.token);
+        localStorage.setItem("foodie_user", JSON.stringify(result.user));
         
         triggerAlert(`Account registered successfully. Welcome, ${name}!`, "success");
         setShowLogin(false);
